@@ -1,0 +1,72 @@
+# IDE/Dev-tools generated files #
+#################################
+bin/
+.metadata
+target/
+*.settings
+*.classpath
+*.*~
+.buildpath
+.project
+.settings*
+*.orig
+*.pmd
+*.iml
+.idea/
+.anahaw/
+application.pid
+
+# Compiled source #
+###################
+# Note(Removed):
+# 1.) "*.o", because generated/installed node_modules has it.
+*.com
+*.class
+*.dll
+*.exe
+*.so
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+# Note(Removed):
+# 1.) "*.gz", because of the tracked node_modules compressed files.
+# 2.) "*.zip", because generated/installed node_modules has it.
+*.7z
+*.dmg
+*.iso
+#*.jar
+*.rar
+*.tar
+
+# Logs and databases #
+######################
+# Note(Removed):
+# 1.) "*.sql", because of the development.sql file used for DB-table inserts.
+*.log
+*.sqlite
+
+# PROJECT SCOPE #
+#################
+*/node_modules/*
+*.ucls
+*/*/node_modules/*
+#*/*/*/*/*/*/*/*/bower_components/*
+*/app/assets/libs
+epos/dist/*
+*node_modules
+
+# Folder Repositories #
+postgres
+cookies

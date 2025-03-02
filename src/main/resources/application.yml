@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: false
+
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+  domain:
+    name: http://localhost:8080
+
+swagger:
+  host:
+    url: http://localhost:8080
+
+data:
+  max-records: 99
