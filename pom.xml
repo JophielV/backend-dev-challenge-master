@@ -190,7 +190,7 @@
                                 <manifest>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
-                                    <mainClass>com.notes.app.Main
+                                    <mainClass>com.directa24.main.challenge.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

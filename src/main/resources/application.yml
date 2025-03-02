@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
   servlet:
     session:
       cookie:
@@ -11,11 +11,11 @@ logging:
   level:
     com.ecommerce: DEBUG
   domain:
-    name: http://localhost:8080
+    name: http://localhost:8081
 
 swagger:
   host:
-    url: http://localhost:8080
+    url: http://localhost:8081
 
 data:
   max-records: 99
