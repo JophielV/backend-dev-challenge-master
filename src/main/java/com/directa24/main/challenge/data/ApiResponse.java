@@ -8,7 +8,7 @@ public class ApiResponse {
 
     private Integer page;
 
-    @JsonProperty("per_pages")
+    @JsonProperty("per_page")
     private Integer perPage;
 
     private Integer total;
@@ -16,6 +16,7 @@ public class ApiResponse {
     @JsonProperty("total_pages")
     private Integer totalPages;
 
+    @JsonProperty("data")
     private List<Movie> data;
 
     public Integer getPage() {
