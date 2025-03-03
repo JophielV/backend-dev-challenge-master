@@ -25,8 +25,7 @@ public class WebServiceConfiguration {
     private Integer connectionTimeoutMillis;
 
     @Bean
-    public RestTemplate apiServiceRestTemplate(@Value("${apiService.url}") final String url,
-                                               final MappingJackson2HttpMessageConverter messageConverter) {
+    public RestTemplate restTemplate(final MappingJackson2HttpMessageConverter messageConverter) {
         return new RestTemplateBuilder()
                 .setReadTimeout(Duration.ofMillis(readTimeoutMillis))
                 .setConnectTimeout(Duration.ofMillis(connectionTimeoutMillis))
