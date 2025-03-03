@@ -53,12 +53,6 @@ public class MovieServiceImpl implements MovieService {
         ApiResponse apiResponse = restTemplate.exchange(builder.buildAndExpand(finalUrl).toUri(), GET, entity, ApiResponse.class).getBody();
         allMovies.addAll(apiResponse.getData());
 
-        System.out.println("---- page : " + apiResponse.getPage());
-        System.out.println("---- perPage : " + apiResponse.getPerPage());
-        System.out.println("---- total : " + apiResponse.getTotal());
-        System.out.println("---- totalPages : " + apiResponse.getTotalPages());
-        System.out.println("---- apiResponse Data count : " + apiResponse.getData().size());
-
         int i = 2;
         while (i <= apiResponse.getTotalPages()) {
             finalUrl = apiUrl;
@@ -72,34 +66,14 @@ public class MovieServiceImpl implements MovieService {
 
             ApiResponse apiResponse2 = restTemplate.exchange(builder.buildAndExpand(finalUrl).toUri(), GET, entity, ApiResponse.class).getBody();
             allMovies.addAll(apiResponse2.getData());
-            System.out.println("---- page : " + apiResponse2.getPage());
-            System.out.println("---- perPage : " + apiResponse2.getPerPage());
-            System.out.println("---- total : " + apiResponse2.getTotal());
-            System.out.println("---- totalPages : " + apiResponse2.getTotalPages());
-            System.out.println("---- apiResponse Data count : " + apiResponse2.getData().size());
             i++;
         }
 
-        System.out.println("---- All count: " + allMovies.size());
-        allMovies.forEach(a -> {
-            System.out.println("--------------------");
-            System.out.println("---- : " + a.getDirector());
-            System.out.println("---- : " + a.getGenre());
-            System.out.println("---- : " + a.getTitle());
-            System.out.println("---- : " + a.getWriter());
-            System.out.println("---- : " + a.getActors());
-            System.out.println("---- : " + a.getRated());
-            System.out.println("---- : " + a.getRuntime());
-            System.out.println("---- : " + a.getYear());
-            System.out.println("--------------------");
-        });
-
-        List<String> x = allMovies.stream().collect(Collectors.groupingBy(Movie::getDirector, Collectors.counting()))
-                .entrySet().stream().filter(entry -> entry.getValue() > threshold).map(Map.Entry::getKey).sorted().collect(Collectors.toList());
-        System.out.println(x);
 
         return allMovies.stream().collect(Collectors.groupingBy(Movie::getDirector, Collectors.counting()))
-                .entrySet().stream().filter(entry -> entry.getValue() > threshold).map(Map.Entry::getKey).sorted().collect(Collectors.toList());
+                .entrySet().stream().filter(entry -> entry.getValue() > threshold).
+                map(Map.Entry::getKey).sorted()
+                .collect(Collectors.toList());
     }
 
 }
