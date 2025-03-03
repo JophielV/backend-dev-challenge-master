@@ -9,7 +9,7 @@ server:
 
 logging:
   level:
-    com.ecommerce: DEBUG
+    com.direct24a: DEBUG
   domain:
     name: http://localhost:8081
 

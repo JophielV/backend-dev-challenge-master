@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,48 +31,34 @@ public class MovieServiceImpl implements MovieService {
         this.apiUrl = apiUrl;
     }
 
-    @PostConstruct
-    public void init() {
-        this.getDirectors(4);
-    }
-
     public List<String> getDirectors(int threshold) {
         List<Movie> allMovies = new ArrayList<>();
 
-
-        String finalUrl = apiUrl;
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(finalUrl)
-                // Add query parameter
-                .queryParam("page", "1");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "application/json");
-        HttpEntity entity = new HttpEntity(headers);
-
-        ApiResponse apiResponse = restTemplate.exchange(builder.buildAndExpand(finalUrl).toUri(), GET, entity, ApiResponse.class).getBody();
+        ApiResponse apiResponse = executeRequest(1);
         allMovies.addAll(apiResponse.getData());
 
         int i = 2;
         while (i <= apiResponse.getTotalPages()) {
-            finalUrl = apiUrl;
-            builder = UriComponentsBuilder.fromUriString(finalUrl)
-                    // Add query parameter
-                    .queryParam("page", String.valueOf(i));
-
-            headers = new HttpHeaders();
-            headers.set("Accept", "application/json");
-            entity = new HttpEntity(headers);
-
-            ApiResponse apiResponse2 = restTemplate.exchange(builder.buildAndExpand(finalUrl).toUri(), GET, entity, ApiResponse.class).getBody();
-            allMovies.addAll(apiResponse2.getData());
+            apiResponse = executeRequest(i);
+            allMovies.addAll(apiResponse.getData());
             i++;
         }
-
 
         return allMovies.stream().collect(Collectors.groupingBy(Movie::getDirector, Collectors.counting()))
                 .entrySet().stream().filter(entry -> entry.getValue() > threshold).
                 map(Map.Entry::getKey).sorted()
                 .collect(Collectors.toList());
+    }
+
+    private ApiResponse executeRequest(int page) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl)
+                .queryParam("page", String.valueOf(page));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        HttpEntity entity = new HttpEntity(headers);
+
+        return restTemplate.exchange(builder.buildAndExpand(apiUrl).toUri(), GET, entity, ApiResponse.class).getBody();
     }
 
 }
