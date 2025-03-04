@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -24,7 +26,11 @@ public class DirectorControllerImpl implements DirectorController {
 
     @GetMapping
     public ResponseEntity<List<String>> getDirectors(@RequestParam int threshold) {
-        return ResponseEntity.ok(movieService.getDirectors(threshold));
+        Instant start = Instant.now();
+        ResponseEntity<List<String>> response = ResponseEntity.ok(movieService.getDirectors(threshold));
+        Instant end = Instant.now();
+       log.info("Execution duration:  {}", Duration.between(start, end).toMillis());
+        return response;
     }
 
 }
