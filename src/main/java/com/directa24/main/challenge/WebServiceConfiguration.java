@@ -2,18 +2,17 @@ package com.directa24.main.challenge;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.tcp.TcpClient;
 
-import java.time.Duration;
-
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Configuration
@@ -25,15 +24,17 @@ public class WebServiceConfiguration {
     private Integer connectionTimeoutMillis;
 
     @Bean
-    public RestTemplate restTemplate(final MappingJackson2HttpMessageConverter messageConverter) {
-        return new RestTemplateBuilder()
-                .setReadTimeout(Duration.ofMillis(readTimeoutMillis))
-                .setConnectTimeout(Duration.ofMillis(connectionTimeoutMillis))
-                .messageConverters(messageConverter)
-                .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+    public WebClient webClient() {
+        TcpClient tcpClient = TcpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
+                .doOnConnected(connection ->
+                        connection.addHandlerLast(new ReadTimeoutHandler(readTimeoutMillis)));
+
+        return WebClient.create()
+                .mutate()
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
                 .build();
     }
-
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
