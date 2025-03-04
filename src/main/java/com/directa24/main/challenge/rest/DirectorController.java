@@ -16,6 +16,6 @@ public interface DirectorController {
     @Operation(summary = "Gets directors")
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid threshold or missing value") })
     @GetMapping
-    ResponseEntity<List<String>> getDirectors(@ApiParam(value = "Threshold value for the number of movies directed", required = true) int threshold);
+    ResponseEntity<List<String>> getDirectors(@ApiParam(value = "Threshold value to filter the number of movies directed (greater than)", required = true) int threshold);
 
 }

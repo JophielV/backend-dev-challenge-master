@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class MovieServiceImpl implements MovieService {
 
+    private static final String PAGE = "page";
     private final String apiUrl;
     private final WebClient webClient;
 
@@ -34,40 +35,47 @@ public class MovieServiceImpl implements MovieService {
         this.webClient = webClient;
     }
 
+    @Override
     public List<String> getDirectors(int threshold) {
         List<Movie> allMovies = new ArrayList<>();
 
+        // get the initial response of data for page 1, this will also return total_pages field
+        // which will determine how many times we will be iterating to get all movies at the end of the page
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl)
-                .queryParam("page", String.valueOf(1));
-
+                .queryParam(PAGE, String.valueOf(1));
         ApiResponse initialApiResponse = webClient
                 .get()
                 .uri(builder.buildAndExpand(apiUrl).toUri())
                 .retrieve()
                 .bodyToMono(ApiResponse.class).block();
 
-        if (initialApiResponse == null) return new ArrayList<>();
+        if (initialApiResponse == null) return List.of();
 
         allMovies.addAll(initialApiResponse.getData());
-        allMovies.addAll(callSucceedingRequests(initialApiResponse));
+        allMovies.addAll(getMoviesForSucceedingPages(initialApiResponse));
 
-        return allMovies.stream().collect(Collectors.groupingBy(Movie::getDirector, Collectors.counting()))
-                .entrySet().stream().filter(entry -> entry.getValue() > threshold).
-                map(Map.Entry::getKey).sorted()
+        return allMovies.stream()
+                .collect(Collectors.groupingBy(Movie::getDirector, Collectors.counting()))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue() > threshold)
+                .map(Map.Entry::getKey)
+                .sorted()
                 .collect(Collectors.toList());
     }
 
-    private List<Movie> callSucceedingRequests(ApiResponse initialApiResponse) {
+    private List<Movie> getMoviesForSucceedingPages(ApiResponse initialApiResponse) {
         final List<URI> urls = new ArrayList<>();
+        // composing request urls starting now at 2nd page up to the end of the page
         int i = 2;
         while (i <= initialApiResponse.getTotalPages()) {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl)
-                    .queryParam("page", String.valueOf(i));
+                    .queryParam(PAGE, String.valueOf(i));
             urls.add(builder.buildAndExpand(apiUrl).toUri());
             i++;
         }
 
         if (!CollectionUtils.isEmpty(urls)) {
+            // send requests asynchronously as each succeeding request do not depend on each other
             final Flux<ApiResponse> events = Flux.fromIterable(urls)
                     .flatMap(uri -> request(webClient, uri));
             return Objects.requireNonNull(events
@@ -79,7 +87,7 @@ public class MovieServiceImpl implements MovieService {
                     .collect(Collectors.toList());
         }
 
-        return new ArrayList<>();
+        return List.of();
     }
 
     private static Mono<ApiResponse> request(WebClient webClient, URI uri) {

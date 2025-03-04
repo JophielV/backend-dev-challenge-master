@@ -18,13 +18,9 @@ import reactor.netty.tcp.TcpClient;
 @Configuration
 public class WebServiceConfiguration {
 
-    @Value("${apiService.readTimeoutMillis}")
-    private Integer readTimeoutMillis;
-    @Value("${apiService.connectionTimeoutMillis}")
-    private Integer connectionTimeoutMillis;
-
     @Bean
-    public WebClient webClient() {
+    public WebClient webClient(@Value("${apiService.readTimeoutMillis}") Integer readTimeoutMillis,
+                               @Value("${apiService.connectionTimeoutMillis}") Integer connectionTimeoutMillis) {
         TcpClient tcpClient = TcpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
                 .doOnConnected(connection ->
@@ -34,13 +30,5 @@ public class WebServiceConfiguration {
                 .mutate()
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
                 .build();
-    }
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        objectMapper.findAndRegisterModules();
-        return objectMapper;
     }
 }
